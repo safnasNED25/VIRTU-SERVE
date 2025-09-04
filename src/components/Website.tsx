@@ -225,7 +225,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 lg:text-left text-center">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Expertise</h3>
               <div className="space-y-4">
@@ -447,13 +447,13 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                     onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
                   >
-                    Normal Call
+                    📞 Normal Call
                   </button>
                   <button
                     onClick={() => window.open(contactInfo.socialMedia.whatsapp, '_blank')}
                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
                   >
-                    WhatsApp Call
+                    💬 WhatsApp Call
                   </button>
                 </div>
               </div>
