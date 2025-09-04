@@ -27,7 +27,12 @@ import {
   Filter,
   MessageSquare,
   CheckSquare,
-  MoreVertical
+  MoreVertical,
+  Linkedin, // Add this import
+  Instagram, // Add this import
+  Facebook, // Add this import
+  MessageCircle, // Add this import
+  Music // Add this import (for TikTok)
 } from 'lucide-react';
 import { Service, ContactInfo, VisitorData, Testimonial } from '../types';
 
