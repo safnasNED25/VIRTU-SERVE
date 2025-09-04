@@ -447,13 +447,13 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                     onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
                   >
-                    📞 Normal Call
+                    Normal Call
                   </button>
                   <button
                     onClick={() => window.open(contactInfo.socialMedia.whatsapp, '_blank')}
                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
                   >
-                    💬 WhatsApp Call
+                    WhatsApp Call
                   </button>
                 </div>
               </div>
