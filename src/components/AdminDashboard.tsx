@@ -751,57 +751,98 @@ export default function AdminDashboard({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Profile Picture URL
-                      </label>
-                      <input
-                        type="url"
-                        value={editingTestimonial.avatar}
-                        onChange={(e) => setEditingTestimonial({
-                          ...editingTestimonial,
-                          avatar: e.target.value
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="https://example.com/photo.jpg"
-                      />
-                      {editingTestimonial.avatar && (
-                        <div className="mt-2">
-                          <img
-                            src={editingTestimonial.avatar}
-                            alt="Preview"
-                            className="w-16 h-16 rounded-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop';
-                            }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Profile Picture
+  </label>
 
-                  <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                      onClick={() => {
-                        setEditingTestimonial(null);
-                        setIsAddingTestimonial(false);
-                      }}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleSaveTestimonial}
-                      disabled={!editingTestimonial.name || !editingTestimonial.comment}
-                      className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Save className="w-4 h-4" />
-                      <span>Save</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+  {/* URL input */}
+  <input
+    type="url"
+    value={editingTestimonial.avatar}
+    onChange={(e) =>
+      setEditingTestimonial({
+        ...editingTestimonial,
+        avatar: e.target.value
+      })
+    }
+    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
+    placeholder="https://example.com/photo.jpg"
+  />
+
+  {/* File upload */}
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setEditingTestimonial({
+            ...editingTestimonial,
+            avatar: reader.result as string // Base64 string
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    }}
+    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
+  />
+
+  {/* Default icons */}
+  <div className="flex items-center space-x-3 mt-2">
+    <button
+      type="button"
+      onClick={() =>
+        setEditingTestimonial({
+          ...editingTestimonial,
+          avatar:
+            "https://cdn-icons-png.flaticon.com/512/1999/1999625.png" // 👨 male avatar
+        })
+      }
+      className="p-2 border rounded-full hover:bg-gray-100"
+    >
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/1999/1999625.png"
+        alt="Male avatar"
+        className="w-10 h-10 rounded-full"
+      />
+    </button>
+    <button
+      type="button"
+      onClick={() =>
+        setEditingTestimonial({
+          ...editingTestimonial,
+          avatar:
+            "https://cdn-icons-png.flaticon.com/512/6997/6997662.png" // 👩 female avatar
+        })
+      }
+      className="p-2 border rounded-full hover:bg-gray-100"
+    >
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png"
+        alt="Female avatar"
+        className="w-10 h-10 rounded-full"
+      />
+    </button>
+  </div>
+
+  {/* Preview */}
+  {editingTestimonial.avatar && (
+    <div className="mt-2">
+      <img
+        src={editingTestimonial.avatar}
+        alt="Preview"
+        className="w-16 h-16 rounded-full object-cover"
+        onError={(e) => {
+          e.currentTarget.src =
+            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop";
+        }}
+      />
+    </div>
+  )}
+</div>
+
         )}
 
         {/* Contact Tab */}
