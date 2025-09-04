@@ -367,7 +367,7 @@ export default function AdminDashboard({
                 className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Service/Product</span>
+                <span>Add Service</span>
               </button>
             </div>
 
@@ -469,8 +469,8 @@ export default function AdminDashboard({
                         })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <option value="Product Services">Products</option>
-                        <option value="Service Services">Services</option>
+                        <option value="Product Services">Product Services</option>
+                        <option value="Service Services">Service Services</option>
                         <option value="Custom Category">Add Custom Category</option>
                       </select>
                     </div>
@@ -673,7 +673,6 @@ export default function AdminDashboard({
                   </div>
 
                   <div className="space-y-4">
-                    {/* Customer Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Customer Name
@@ -681,18 +680,15 @@ export default function AdminDashboard({
                       <input
                         type="text"
                         value={editingTestimonial.name}
-                        onChange={(e) =>
-                          setEditingTestimonial({
-                            ...editingTestimonial,
-                            name: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          name: e.target.value
+                        })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Enter customer name"
                       />
                     </div>
 
-                    {/* Designation */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Designation/Title
@@ -700,18 +696,15 @@ export default function AdminDashboard({
                       <input
                         type="text"
                         value={editingTestimonial.designation}
-                        onChange={(e) =>
-                          setEditingTestimonial({
-                            ...editingTestimonial,
-                            designation: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          designation: e.target.value
+                        })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="e.g., Marketing Director, CEO"
                       />
                     </div>
 
-                    {/* Rating */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Rating
@@ -720,128 +713,57 @@ export default function AdminDashboard({
                         {Array.from({ length: 5 }, (_, index) => (
                           <button
                             key={index}
-                            onClick={() =>
-                              setEditingTestimonial({
-                                ...editingTestimonial,
-                                rating: index + 1,
-                              })
-                            }
+                            onClick={() => setEditingTestimonial({
+                              ...editingTestimonial,
+                              rating: index + 1
+                            })}
                             className="focus:outline-none"
                           >
                             <Star
                               className={`w-6 h-6 transition-colors ${
-                                index < editingTestimonial.rating
-                                  ? 'text-yellow-400 fill-current hover:text-yellow-500'
+                                index < editingTestimonial.rating 
+                                  ? 'text-yellow-400 fill-current hover:text-yellow-500' 
                                   : 'text-gray-300 hover:text-gray-400'
                               }`}
                             />
                           </button>
                         ))}
                         <span className="ml-2 text-sm text-gray-600">
-                          {editingTestimonial.rating} star
-                          {editingTestimonial.rating !== 1 ? 's' : ''}
+                          {editingTestimonial.rating} star{editingTestimonial.rating !== 1 ? 's' : ''}
                         </span>
                       </div>
                     </div>
 
-                    {/* Review Comment */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Review Comment
                       </label>
                       <textarea
                         value={editingTestimonial.comment}
-                        onChange={(e) =>
-                          setEditingTestimonial({
-                            ...editingTestimonial,
-                            comment: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          comment: e.target.value
+                        })}
                         rows={4}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Enter the customer's review..."
                       />
                     </div>
 
-                    {/* Profile Picture Section */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Profile Picture
+                        Profile Picture URL
                       </label>
-
-                      {/* URL input */}
                       <input
                         type="url"
                         value={editingTestimonial.avatar}
-                        onChange={(e) =>
-                          setEditingTestimonial({
-                            ...editingTestimonial,
-                            avatar: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          avatar: e.target.value
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="https://example.com/photo.jpg"
                       />
-
-                      {/* File upload */}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setEditingTestimonial({
-                                ...editingTestimonial,
-                                avatar: reader.result as string, // Base64 string
-                              });
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
-                      />
-
-                      {/* Default Male / Female Icons */}
-                      <div className="flex items-center space-x-3 mt-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditingTestimonial({
-                              ...editingTestimonial,
-                              avatar:
-                                'https://cdn-icons-png.flaticon.com/512/1999/1999625.png', // 👨 Male
-                            })
-                          }
-                          className="p-2 border rounded-full hover:bg-gray-100"
-                        >
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/1999/1999625.png"
-                            alt="Male avatar"
-                            className="w-10 h-10 rounded-full"
-                          />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditingTestimonial({
-                              ...editingTestimonial,
-                              avatar:
-                                'https://cdn-icons-png.flaticon.com/512/6997/6997662.png', // 👩 Female
-                            })
-                          }
-                          className="p-2 border rounded-full hover:bg-gray-100"
-                        >
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png"
-                            alt="Female avatar"
-                            className="w-10 h-10 rounded-full"
-                          />
-                        </button>
-                      </div>
-
-                      {/* Preview */}
                       {editingTestimonial.avatar && (
                         <div className="mt-2">
                           <img
@@ -849,8 +771,7 @@ export default function AdminDashboard({
                             alt="Preview"
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
-                              e.currentTarget.src =
-                                'https://images.pexels.com/photos-774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop';
+                              e.currentTarget.src = 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop';
                             }}
                           />
                         </div>
@@ -858,7 +779,6 @@ export default function AdminDashboard({
                     </div>
                   </div>
 
-                  {/* Footer Buttons */}
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       onClick={() => {
@@ -882,29 +802,7 @@ export default function AdminDashboard({
               </div>
             )}
           </div>
-        )}      {/* Footer Buttons */}
-      <div className="flex justify-end space-x-3 mt-6">
-        <button
-          onClick={() => {
-            setEditingTestimonial(null);
-            setIsAddingTestimonial(false);
-          }}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSaveTestimonial}
-          disabled={!editingTestimonial.name || !editingTestimonial.comment}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save</span>
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        )}
 
         {/* Contact Tab */}
         {activeTab === 'contact' && (
@@ -1235,6 +1133,5 @@ export default function AdminDashboard({
         )}
       </div>
     </div>
-  
   );
 }
