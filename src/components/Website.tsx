@@ -442,7 +442,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
               <h3 className="text-xl font-bold text-gray-900 mb-2">Phone</h3>
               <div className="space-y-3">
                 <p className="text-gray-600">{contactInfo.phone}</p>
-                <div className="flex flex-col space-y-2">
+                <div className="flex flex-col space-y-2 group-hover:opacity-100 transition-opacity duration-300">
                   <button
                     onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
