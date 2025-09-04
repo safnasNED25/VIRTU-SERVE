@@ -556,7 +556,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                   onClick={() => handleSocialClick(contactInfo.socialMedia.tiktok)}
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-1"
                 >
-                  <TikTokIcon className="w-5 h-5" />
+                  <TikTokIcon className="w-5 h-5 text-white" />
                 </button>
                 <button 
                   onClick={() => handleSocialClick(contactInfo.socialMedia.email)}
