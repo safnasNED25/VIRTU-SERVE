@@ -61,6 +61,7 @@ export default function AdminDashboard({
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [selectedTestimonials, setSelectedTestimonials] = useState<string[]>([]);
+  const [tempContactInfo, setTempContactInfo] = useState<ContactInfo>(contactInfo);
 
   const categories = Array.from(new Set(services.map(service => service.category)));
   
@@ -78,7 +79,7 @@ export default function AdminDashboard({
       id: Date.now().toString(),
       title: '',
       description: '',
-      category: categories[0] || 'General Services'
+      category: 'Product Services' // Default to products
     };
     setEditingService(newService);
     setIsAddingService(true);
@@ -104,8 +105,16 @@ export default function AdminDashboard({
   };
 
   const handleSaveContact = () => {
+    onUpdateContactInfo(tempContactInfo);
     setEditingContact(false);
   };
+
+  // Update temp contact info when editing starts
+  React.useEffect(() => {
+    if (editingContact) {
+      setTempContactInfo(contactInfo);
+    }
+  }, [editingContact, contactInfo]);
 
   const handleAddTestimonial = () => {
     const newTestimonial: Testimonial = {
@@ -460,17 +469,16 @@ export default function AdminDashboard({
                         })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        {categories.map(category => (
-                          <option key={category} value={category}>{category}</option>
-                        ))}
-                        <option value="New Category">Add New Category</option>
+                        <option value="Product Services">Product Services</option>
+                        <option value="Service Services">Service Services</option>
+                        <option value="Custom Category">Add Custom Category</option>
                       </select>
                     </div>
 
-                    {editingService.category === 'New Category' && (
+                    {editingService.category === 'Custom Category' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          New Category Name
+                          Custom Category Name
                         </label>
                         <input
                           type="text"
@@ -823,9 +831,9 @@ export default function AdminDashboard({
                   {editingContact ? (
                     <input
                       type="text"
-                      value={contactInfo.phone}
-                      onChange={(e) => onUpdateContactInfo({
-                        ...contactInfo,
+                      value={tempContactInfo.phone}
+                      onChange={(e) => setTempContactInfo({
+                        ...tempContactInfo,
                         phone: e.target.value
                       })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -843,9 +851,9 @@ export default function AdminDashboard({
                   {editingContact ? (
                     <input
                       type="email"
-                      value={contactInfo.email}
-                      onChange={(e) => onUpdateContactInfo({
-                        ...contactInfo,
+                      value={tempContactInfo.email}
+                      onChange={(e) => setTempContactInfo({
+                        ...tempContactInfo,
                         email: e.target.value
                       })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -862,9 +870,9 @@ export default function AdminDashboard({
                   </label>
                   {editingContact ? (
                     <textarea
-                      value={contactInfo.address}
-                      onChange={(e) => onUpdateContactInfo({
-                        ...contactInfo,
+                      value={tempContactInfo.address}
+                      onChange={(e) => setTempContactInfo({
+                        ...tempContactInfo,
                         address: e.target.value
                       })}
                       rows={2}
@@ -888,11 +896,11 @@ export default function AdminDashboard({
                       {editingContact ? (
                         <input
                           type="text"
-                          value={contactInfo.businessHours.weekdays}
-                          onChange={(e) => onUpdateContactInfo({
-                            ...contactInfo,
+                          value={tempContactInfo.businessHours.weekdays}
+                          onChange={(e) => setTempContactInfo({
+                            ...tempContactInfo,
                             businessHours: {
-                              ...contactInfo.businessHours,
+                              ...tempContactInfo.businessHours,
                               weekdays: e.target.value
                             }
                           })}
@@ -910,11 +918,11 @@ export default function AdminDashboard({
                       {editingContact ? (
                         <input
                           type="text"
-                          value={contactInfo.businessHours.saturday}
-                          onChange={(e) => onUpdateContactInfo({
-                            ...contactInfo,
+                          value={tempContactInfo.businessHours.saturday}
+                          onChange={(e) => setTempContactInfo({
+                            ...tempContactInfo,
                             businessHours: {
-                              ...contactInfo.businessHours,
+                              ...tempContactInfo.businessHours,
                               saturday: e.target.value
                             }
                           })}
@@ -932,11 +940,11 @@ export default function AdminDashboard({
                       {editingContact ? (
                         <input
                           type="text"
-                          value={contactInfo.businessHours.sunday}
-                          onChange={(e) => onUpdateContactInfo({
-                            ...contactInfo,
+                          value={tempContactInfo.businessHours.sunday}
+                          onChange={(e) => setTempContactInfo({
+                            ...tempContactInfo,
                             businessHours: {
-                              ...contactInfo.businessHours,
+                              ...tempContactInfo.businessHours,
                               sunday: e.target.value
                             }
                           })}
@@ -963,11 +971,11 @@ export default function AdminDashboard({
                     {editingContact ? (
                       <input
                         type="url"
-                        value={contactInfo.socialMedia.linkedin}
-                        onChange={(e) => onUpdateContactInfo({
-                          ...contactInfo,
+                        value={tempContactInfo.socialMedia.linkedin}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
                           socialMedia: {
-                            ...contactInfo.socialMedia,
+                            ...tempContactInfo.socialMedia,
                             linkedin: e.target.value
                           }
                         })}
@@ -987,11 +995,11 @@ export default function AdminDashboard({
                     {editingContact ? (
                       <input
                         type="url"
-                        value={contactInfo.socialMedia.instagram}
-                        onChange={(e) => onUpdateContactInfo({
-                          ...contactInfo,
+                        value={tempContactInfo.socialMedia.instagram}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
                           socialMedia: {
-                            ...contactInfo.socialMedia,
+                            ...tempContactInfo.socialMedia,
                             instagram: e.target.value
                           }
                         })}
@@ -1011,11 +1019,11 @@ export default function AdminDashboard({
                     {editingContact ? (
                       <input
                         type="url"
-                        value={contactInfo.socialMedia.facebook}
-                        onChange={(e) => onUpdateContactInfo({
-                          ...contactInfo,
+                        value={tempContactInfo.socialMedia.facebook}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
                           socialMedia: {
-                            ...contactInfo.socialMedia,
+                            ...tempContactInfo.socialMedia,
                             facebook: e.target.value
                           }
                         })}
@@ -1035,11 +1043,11 @@ export default function AdminDashboard({
                     {editingContact ? (
                       <input
                         type="url"
-                        value={contactInfo.socialMedia.whatsapp}
-                        onChange={(e) => onUpdateContactInfo({
-                          ...contactInfo,
+                        value={tempContactInfo.socialMedia.whatsapp}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
                           socialMedia: {
-                            ...contactInfo.socialMedia,
+                            ...tempContactInfo.socialMedia,
                             whatsapp: e.target.value
                           }
                         })}
@@ -1059,11 +1067,11 @@ export default function AdminDashboard({
                     {editingContact ? (
                       <input
                         type="url"
-                        value={contactInfo.socialMedia.tiktok}
-                        onChange={(e) => onUpdateContactInfo({
-                          ...contactInfo,
+                        value={tempContactInfo.socialMedia.tiktok}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
                           socialMedia: {
-                            ...contactInfo.socialMedia,
+                            ...tempContactInfo.socialMedia,
                             tiktok: e.target.value
                           }
                         })}
@@ -1083,11 +1091,11 @@ export default function AdminDashboard({
                     {editingContact ? (
                       <input
                         type="text"
-                        value={contactInfo.socialMedia.email}
-                        onChange={(e) => onUpdateContactInfo({
-                          ...contactInfo,
+                        value={tempContactInfo.socialMedia.email}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
                           socialMedia: {
-                            ...contactInfo.socialMedia,
+                            ...tempContactInfo.socialMedia,
                             email: e.target.value
                           }
                         })}
@@ -1102,7 +1110,16 @@ export default function AdminDashboard({
               </div>
             </div>
             {editingContact && (
-              <div className="flex justify-end mt-6 lg:col-span-2">
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setEditingContact(false);
+                    setTempContactInfo(contactInfo);
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
                 <button
                   onClick={handleSaveContact}
                   className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"

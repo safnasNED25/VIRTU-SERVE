@@ -6,37 +6,37 @@ export const initialServices: Service[] = [
     id: '1',
     title: 'Data Management & Entry Services',
     description: 'Precision data entry and typing solutions tailored to your needs.',
-    category: 'Data & Administrative Services'
+    category: 'Service Services'
   },
   {
     id: '2',
     title: 'Lead Generation & Data Extraction',
     description: 'Strategic sourcing and extraction of high-quality leads for business growth.',
-    category: 'Data & Administrative Services'
+    category: 'Service Services'
   },
   {
     id: '3',
     title: 'Comprehensive Workbook Management',
     description: 'Efficient management and organization of complex workbooks.',
-    category: 'Data & Administrative Services'
+    category: 'Product Services'
   },
   {
     id: '4',
     title: 'Advanced Spreadsheet Solutions',
     description: 'Expertise in MS Office Suite and Google Sheets for optimized data handling.',
-    category: 'Data & Administrative Services'
+    category: 'Product Services'
   },
   {
     id: '5',
     title: 'Data Replication & Conversion Services',
     description: 'Seamless copy-paste tasks and file format conversions for streamlined workflows.',
-    category: 'Data & Administrative Services'
+    category: 'Service Services'
   },
   {
     id: '6',
     title: 'Academic Typing & Document Preparation',
     description: 'Specialized services for exam preparation, including multiple-choice questions and academic typing.',
-    category: 'Data & Administrative Services'
+    category: 'Service Services'
   },
   
   // Professional Services
@@ -44,31 +44,31 @@ export const initialServices: Service[] = [
     id: '7',
     title: 'Professional CV & Resume Optimization',
     description: 'Crafting and enhancing resumes to highlight your strengths and achieve your career goals.',
-    category: 'Professional Services'
+    category: 'Service Services'
   },
   {
     id: '8',
     title: 'Professional Call Handling',
     description: 'Efficient management of business and client calls with clarity, professionalism, and care.',
-    category: 'Professional Services'
+    category: 'Service Services'
   },
   {
     id: '9',
     title: 'Presentation Creation',
     description: 'Engaging and impactful presentations tailored for academic, corporate, or business needs.',
-    category: 'Professional Services'
+    category: 'Product Services'
   },
   {
     id: '10',
     title: 'LinkedIn Profile Creation',
     description: 'Optimized LinkedIn profiles designed to highlight professional achievements and attract opportunities.',
-    category: 'Professional Services'
+    category: 'Product Services'
   },
   {
     id: '11',
     title: 'EBook Development',
     description: 'Well-structured and professionally designed ebooks on diverse topics to showcase expertise and add value.',
-    category: 'Professional Services'
+    category: 'Product Services'
   },
   
   // Creative & Design Services
@@ -76,31 +76,31 @@ export const initialServices: Service[] = [
     id: '12',
     title: 'Design Services for Gem Business Owners',
     description: 'Creative, industry-focused designs that enhance brand identity and appeal in the gem and jewelry sector.',
-    category: 'Creative & Design Services'
+    category: 'Service Services'
   },
   {
     id: '13',
     title: 'Customized Sticker Creation',
     description: 'Unique, high-quality stickers customized to suit personal, branding, or business requirements.',
-    category: 'Creative & Design Services'
+    category: 'Product Services'
   },
   {
     id: '14',
     title: 'Customized Bookmarks',
     description: 'Beautifully designed, printable bookmarks tailored with your favorite pictures, quotes, or themes.',
-    category: 'Creative & Design Services'
+    category: 'Product Services'
   },
   {
     id: '15',
     title: 'Calligraphy Designs',
     description: 'Elegant and artistic calligraphy creations, perfect for gifts, branding, and personalized projects.',
-    category: 'Creative & Design Services'
+    category: 'Product Services'
   },
   {
     id: '16',
     title: 'Customized Instagram Highlights',
     description: 'Aesthetic and personalized Instagram highlight covers designed to reflect your brand identity or personal style.',
-    category: 'Creative & Design Services'
+    category: 'Product Services'
   }
 ];
 

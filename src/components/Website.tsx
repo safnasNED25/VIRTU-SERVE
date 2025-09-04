@@ -226,7 +226,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+            <div className="space-y-6 lg:text-left text-center">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Expertise</h3>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
@@ -252,7 +252,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
               </div>
             </div>
             
-            <div className="relative">
+            <div className="relative lg:block hidden">
               <img 
                 src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop" 
                 alt="Professional team working on data analysis" 
@@ -265,6 +265,15 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                   <p className="text-sm opacity-90">Always here when you need us</p>
                 </div>
               </div>
+            </div>
+            
+            {/* Mobile/Tablet image - shown on smaller screens */}
+            <div className="relative lg:hidden">
+              <img 
+                src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop" 
+                alt="Professional team working on data analysis" 
+                className="w-full h-64 object-cover rounded-2xl shadow-xl mx-auto"
+              />
             </div>
           </div>
         </div>
@@ -350,37 +359,6 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
             </div>
           </div>
 
-          {/* Category Filter */}
-          <div className="flex justify-center mb-12">
-            <div className="flex flex-wrap gap-3 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  selectedCategory === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Globe className="w-4 h-4" />
-                <span>All Categories</span>
-              </button>
-              {categories.map(category => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    selectedCategory === category
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <Filter className="w-4 h-4" />
-                  <span>{category.replace(' Services', '')}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Services Grid */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="mb-8">
@@ -388,16 +366,13 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                 {serviceType === 'products' ? 'Our Products' : 'Our Services'}
               </h3>
               <p className="text-gray-600">
-                {selectedCategory === 'all' 
-                  ? `All available ${serviceType} across different categories`
-                  : `${serviceType.charAt(0).toUpperCase() + serviceType.slice(1)} in ${selectedCategory.replace(' Services', '')}`
-                }
+                {`All available ${serviceType} across different categories`}
               </p>
             </div>
 
-            {filteredServices.length > 0 ? (
+            {services.filter(service => service.category.toLowerCase().includes(serviceType === 'products' ? 'product' : 'service')).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredServices.map((service) => (
+                {services.filter(service => service.category.toLowerCase().includes(serviceType === 'products' ? 'product' : 'service')).map((service) => (
                   <div 
                     key={service.id}
                     className="bg-gray-50 p-6 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
@@ -465,9 +440,23 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                 <Phone className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Phone</h3>
-              <p className="text-gray-600">
-                {contactInfo.phone}
-              </p>
+              <div className="space-y-3">
+                <p className="text-gray-600">{contactInfo.phone}</p>
+                <div className="flex flex-col space-y-2">
+                  <button
+                    onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    📞 Normal Call
+                  </button>
+                  <button
+                    onClick={() => window.open(contactInfo.socialMedia.whatsapp, '_blank')}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                  >
+                    💬 WhatsApp Call
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="text-center p-8 bg-blue-50 rounded-2xl">
@@ -475,9 +464,15 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                 <Mail className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Email</h3>
-              <p className="text-gray-600">
-                {contactInfo.email}
-              </p>
+              <div className="space-y-3">
+                <p className="text-gray-600">{contactInfo.email}</p>
+                <button
+                  onClick={() => window.open(`mailto:${contactInfo.email}`, '_self')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                >
+                  📧 Send Email
+                </button>
+              </div>
             </div>
 
             <div className="text-center p-8 bg-blue-50 rounded-2xl">
