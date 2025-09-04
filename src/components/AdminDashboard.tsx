@@ -843,7 +843,6 @@ export default function AdminDashboard({
   )}
 </div>
 
-        )}
 
         {/* Contact Tab */}
         {activeTab === 'contact' && (
