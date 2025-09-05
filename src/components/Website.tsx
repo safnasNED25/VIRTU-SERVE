@@ -38,6 +38,7 @@ import { Service, ContactInfo } from '../types';
 import TestimonialSection from './TestimonialSection';
 import { useVisitorTracking } from '../hooks/useVisitorTracking';
 import TikTokIcon from './ui/TikTokIcon';
+import WhatsAppIcon from './ui/WhatsAppIcon';
 
 interface WebsiteProps {
   services: Service[];
@@ -546,7 +547,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                   onClick={() => handleSocialClick(contactInfo.socialMedia.whatsapp)}
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-1"
                 >
-                  <MessageCircle className="w-5 h-5" />
+                  <WhatsAppIcon className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => handleSocialClick(contactInfo.socialMedia.tiktok)}
