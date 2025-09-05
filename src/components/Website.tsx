@@ -37,7 +37,7 @@ import { useState } from 'react';
 import { Service, ContactInfo } from '../types';
 import TestimonialSection from './TestimonialSection';
 import { useVisitorTracking } from '../hooks/useVisitorTracking';
-import TikTokIcon from './TikTokIcon';
+import TikTokIcon from './ui/TikTokIcon';
 
 interface WebsiteProps {
   services: Service[];
