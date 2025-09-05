@@ -35,7 +35,7 @@ import {
   Music // Add this import (for TikTok)
 } from 'lucide-react';
 import { Service, ContactInfo, VisitorData, Testimonial } from '../types';
-import TikTokIcon from './TikTokIcon';
+import TikTokIcon from './ui/TikTokIcon';
 
 interface AdminDashboardProps {
   services: Service[];
