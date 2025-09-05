@@ -27,7 +27,7 @@ import {
   Award,
   Users,
   Facebook,
-  MessageCircle,
+
   Filter,
   Globe,
   Zap,
