@@ -28,7 +28,6 @@ import {
   Users,
   Facebook,
   MessageCircle,
-  Music,
   Filter,
   Globe,
   Zap,
