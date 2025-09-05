@@ -30,12 +30,11 @@ import {
   MoreVertical,
   Linkedin, // Add this import
   Instagram, // Add this import
-  Facebook, // Add this import
-  MessageCircle, // Add this import
-  Music // Add this import (for TikTok)
+  Facebook
 } from 'lucide-react';
 import { Service, ContactInfo, VisitorData, Testimonial } from '../types';
 import TikTokIcon from './ui/TikTokIcon';
+import WhatsAppIcon from './ui/WhatsAppIcon';
 
 interface AdminDashboardProps {
   services: Service[];
@@ -1043,7 +1042,7 @@ export default function AdminDashboard({
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <MessageCircle className="w-4 h-4 inline mr-2" />
+                      <WhatsAppIcon className="w-4 h-4 inline mr-2" />
                       WhatsApp
                     </label>
                     {editingContact ? (
