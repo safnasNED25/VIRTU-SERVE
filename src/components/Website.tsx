@@ -38,6 +38,7 @@ import { useState } from 'react';
 import { Service, ContactInfo } from '../types';
 import TestimonialSection from './TestimonialSection';
 import { useVisitorTracking } from '../hooks/useVisitorTracking';
+import TikTokIcon from './TikTokIcon';
 
 interface WebsiteProps {
   services: Service[];
@@ -552,7 +553,7 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
                   onClick={() => handleSocialClick(contactInfo.socialMedia.tiktok)}
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-1"
                 >
-                  <Music className="w-5 h-5" />
+                  <TikTokIcon className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => handleSocialClick(contactInfo.socialMedia.email)}
