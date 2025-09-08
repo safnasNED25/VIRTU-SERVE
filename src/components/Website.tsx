@@ -107,8 +107,8 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="w-14 h-14 rounded-full overflow-hidden">
-                <img  src="logoooo.jpg"  alt="Logo" className="w-full h-full object-cover"/>
-              </div>
+                  <img  src="logo.png"  alt="Logo" className="w-full h-full object-cover"/>
+                </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">VIRTU SERVE</h1>
                 <p className="text-xs text-gray-600">Virtual Assistant Solutions</p>
