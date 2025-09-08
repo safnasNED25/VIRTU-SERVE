@@ -513,8 +513,8 @@ export default function Website({ services, contactInfo, testimonials, onVisit }
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                 <div className="w-5 h-5 rounded-full overflow-hidden">
-                  <img  src="logoooo.jpg"  alt="Logo" className="w-5 h-5 object-cover"/>
+                 <div className="w-14 h-14 rounded-full overflow-hidden">
+                  <img  src="logo.png"  alt="Logo" className="w-full h-full object-cover"/>
                 </div>
                 <div>
                   <h3 className="text-xl font-bold">VIRTU SERVE</h3>
