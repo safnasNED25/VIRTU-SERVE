@@ -13,7 +13,7 @@ import {
   Settings, 
   Plus, 
   LogOut,
-  Music
+  Music,
   Trash2, 
   Save, 
   X, 
