@@ -30,7 +30,8 @@ import {
   MoreVertical,
   Linkedin, // Add this import
   Instagram, // Add this import
-  Facebook
+  Facebook,
+  Edit
 } from 'lucide-react';
 import { Service, ContactInfo, VisitorData, Testimonial } from '../types';
 import TikTokIcon from './ui/TikTokIcon';
