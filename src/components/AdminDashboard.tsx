@@ -193,8 +193,8 @@ export default function AdminDashboard({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold text-white">V</span>
+              <div className="w-14 h-14 rounded-full overflow-hidden">
+                <img  src="logo.png"  alt="Logo" className="w-full h-full object-cover"/>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Virtu Serve Admin</h1>
