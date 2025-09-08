@@ -17,7 +17,6 @@ import {
   Trash2, 
   Save, 
   X, 
-  LogOut,
   TrendingUp,
   Phone,
   Mail,
