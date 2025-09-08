@@ -12,7 +12,8 @@ import {
   Users, 
   Settings, 
   Plus, 
-  Edit, 
+  LogOut,
+  Music
   Trash2, 
   Save, 
   X, 
