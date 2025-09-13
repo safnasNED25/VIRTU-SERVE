@@ -1,27 +1,41 @@
 import React, { useState } from 'react';
 import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
+import { 
   Users, 
   Settings, 
-  BarChart3, 
-  MessageSquare, 
   Plus, 
-  Edit, 
-  Trash2,
-  Save,
-  X,
   LogOut,
+  Music,
+  Trash2, 
+  Save, 
+  X, 
   TrendingUp,
   Phone,
   Mail,
   MapPin,
   Clock,
   Star,
-  Calendar,
-  Eye,
-  EyeOff
+  Search,
+  Filter,
+  MessageSquare,
+  CheckSquare,
+  MoreVertical,
+  Linkedin, // Add this import
+  Instagram, // Add this import
+  Facebook,
+  Edit
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Service, ContactInfo, VisitorData, Testimonial } from '../types';
+import TikTokIcon from './ui/TikTokIcon';
+import WhatsAppIcon from './ui/WhatsAppIcon';
 import ImageUpload from './ui/ImageUpload';
 
 interface AdminDashboardProps {
@@ -45,222 +59,305 @@ export default function AdminDashboard({
   onUpdateTestimonials,
   onLogout
 }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'services' | 'testimonials' | 'contact'>('analytics');
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [isAddingService, setIsAddingService] = useState(false);
+  const [editingContact, setEditingContact] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
-  const [newService, setNewService] = useState({ title: '', description: '', category: 'Service Services' });
-  const [newTestimonial, setNewTestimonial] = useState({
-    name: '',
-    designation: '',
-    rating: 5,
-    comment: '',
-    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-  });
-  const [showAddService, setShowAddService] = useState(false);
-  const [showAddTestimonial, setShowAddTestimonial] = useState(false);
+  const [isAddingTestimonial, setIsAddingTestimonial] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const [selectedTestimonials, setSelectedTestimonials] = useState<string[]>([]);
+  const [tempContactInfo, setTempContactInfo] = useState<ContactInfo>(contactInfo);
 
-  // Calculate stats
-  const totalVisitors = visitorData.reduce((sum, data) => sum + data.visitors, 0);
-  const averageRating = testimonials.length > 0 
-    ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length 
-    : 0;
+  const categories = Array.from(new Set(services.map(service => service.category)));
+  
+  // Filter testimonials based on search and rating
+  const filteredTestimonials = testimonials.filter(testimonial => {
+    const matchesSearch = testimonial.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         testimonial.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         testimonial.comment.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRating = ratingFilter === null || testimonial.rating === ratingFilter;
+    return matchesSearch && matchesRating;
+  });
 
   const handleAddService = () => {
-    if (newService.title && newService.description) {
-      const service: Service = {
-        id: Date.now().toString(),
-        ...newService
-      };
-      onUpdateServices([...services, service]);
-      setNewService({ title: '', description: '', category: 'Service Services' });
-      setShowAddService(false);
-    }
+    const newService: Service = {
+      id: Date.now().toString(),
+      title: '',
+      description: '',
+      category: 'Product Services' // Default to products
+    };
+    setEditingService(newService);
+    setIsAddingService(true);
   };
 
-  const handleEditService = (service: Service) => {
-    setEditingService(service);
-  };
+  const handleSaveService = () => {
+    if (!editingService) return;
 
-  const handleUpdateService = () => {
-    if (editingService) {
+    if (isAddingService) {
+      onUpdateServices([...services, editingService]);
+    } else {
       onUpdateServices(services.map(s => s.id === editingService.id ? editingService : s));
-      setEditingService(null);
     }
+
+    setEditingService(null);
+    setIsAddingService(false);
   };
 
   const handleDeleteService = (id: string) => {
-    onUpdateServices(services.filter(s => s.id !== id));
+    if (confirm('Are you sure you want to delete this service?')) {
+      onUpdateServices(services.filter(s => s.id !== id));
+    }
   };
+
+  const handleSaveContact = () => {
+    onUpdateContactInfo(tempContactInfo);
+    setEditingContact(false);
+  };
+
+  // Update temp contact info when editing starts
+  React.useEffect(() => {
+    if (editingContact) {
+      setTempContactInfo(contactInfo);
+    }
+  }, [editingContact, contactInfo]);
 
   const handleAddTestimonial = () => {
-    if (newTestimonial.name && newTestimonial.comment) {
-      const testimonial: Testimonial = {
-        id: Date.now().toString(),
-        ...newTestimonial,
-        dateAdded: new Date().toISOString().split('T')[0]
-      };
-      onUpdateTestimonials([...testimonials, testimonial]);
-      setNewTestimonial({
-        name: '',
-        designation: '',
-        rating: 5,
-        comment: '',
-        avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-      });
-      setShowAddTestimonial(false);
-    }
+    const newTestimonial: Testimonial = {
+      id: Date.now().toString(),
+      name: '',
+      designation: '',
+      rating: 5,
+      comment: '',
+      avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+      dateAdded: new Date().toISOString().split('T')[0]
+    };
+    setEditingTestimonial(newTestimonial);
+    setIsAddingTestimonial(true);
   };
 
-  const handleEditTestimonial = (testimonial: Testimonial) => {
-    setEditingTestimonial(testimonial);
-  };
+  const handleSaveTestimonial = () => {
+    if (!editingTestimonial) return;
 
-  const handleUpdateTestimonial = () => {
-    if (editingTestimonial) {
+    if (isAddingTestimonial) {
+      onUpdateTestimonials([...testimonials, editingTestimonial]);
+    } else {
       onUpdateTestimonials(testimonials.map(t => t.id === editingTestimonial.id ? editingTestimonial : t));
-      setEditingTestimonial(null);
     }
+
+    setEditingTestimonial(null);
+    setIsAddingTestimonial(false);
   };
 
   const handleDeleteTestimonial = (id: string) => {
-    onUpdateTestimonials(testimonials.filter(t => t.id !== id));
+    if (confirm('Are you sure you want to delete this testimonial?')) {
+      onUpdateTestimonials(testimonials.filter(t => t.id !== id));
+      setSelectedTestimonials(selectedTestimonials.filter(selectedId => selectedId !== id));
+    }
   };
 
-  const renderStars = (rating: number, interactive: boolean = false, onChange?: (rating: number) => void) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <Star
-        key={index}
-        className={`w-5 h-5 ${
-          index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-        } ${interactive ? 'cursor-pointer hover:text-yellow-400' : ''}`}
-        onClick={interactive && onChange ? () => onChange(index + 1) : undefined}
-      />
-    ));
+  const handleBulkDelete = () => {
+    if (selectedTestimonials.length === 0) return;
+    
+    if (confirm(`Are you sure you want to delete ${selectedTestimonials.length} testimonial(s)?`)) {
+      onUpdateTestimonials(testimonials.filter(t => !selectedTestimonials.includes(t.id)));
+      setSelectedTestimonials([]);
+    }
   };
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'services', label: 'Services', icon: Settings },
-    { id: 'testimonials', label: 'Testimonials', icon: MessageSquare },
-    { id: 'contact', label: 'Contact Info', icon: Phone },
-  ];
+  const toggleTestimonialSelection = (id: string) => {
+    setSelectedTestimonials(prev => 
+      prev.includes(id) 
+        ? prev.filter(selectedId => selectedId !== id)
+        : [...prev, id]
+    );
+  };
+
+  const selectAllTestimonials = () => {
+    if (selectedTestimonials.length === filteredTestimonials.length) {
+      setSelectedTestimonials([]);
+    } else {
+      setSelectedTestimonials(filteredTestimonials.map(t => t.id));
+    }
+  };
+
+  const totalVisitors = visitorData.reduce((sum, data) => sum + data.visitors, 0);
+  const avgVisitors = Math.round(totalVisitors / visitorData.length);
+  const averageTestimonialRating = testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length;
+  const uniqueVisitors = totalVisitors; // Since we now track unique visits only
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full overflow-hidden">
-                <img src="logo.png" alt="Logo" className="w-full h-full object-cover"/>
+              <div className="w-14 h-14 rounded-full overflow-hidden">
+                <img  src="logo.png"  alt="Logo" className="w-full h-full object-cover"/>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-600">Virtu Serve Management</p>
+                <h1 className="text-xl font-bold text-gray-900">Virtu Serve Admin</h1>
+                <p className="text-xs text-gray-600">Dashboard</p>
               </div>
             </div>
-            <button
-              onClick={onLogout}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
-            </button>
+            <div className="flex items-center space-x-4">
+              <a
+                href="/"
+                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Users className="w-4 h-4" />
+                <span>Visit Homepage</span>
+              </a>
+              <button
+                onClick={onLogout}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="mb-8">
-          <nav className="flex space-x-8">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-8 max-w-md">
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
+              activeTab === 'analytics' 
+                ? 'bg-white text-blue-600 shadow-sm' 
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4" />
+            <span>Analytics</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
+              activeTab === 'services' 
+                ? 'bg-white text-blue-600 shadow-sm' 
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Settings className="w-4 h-4" />
+            <span>Services</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('testimonials')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
+              activeTab === 'testimonials' 
+                ? 'bg-white text-blue-600 shadow-sm' 
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Reviews</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('contact')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
+              activeTab === 'contact' 
+                ? 'bg-white text-blue-600 shadow-sm' 
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Phone className="w-4 h-4" />
+            <span>Contact</span>
+          </button>
         </div>
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-8">
-            {/* Stats Cards */}
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Visitors</p>
-                    <p className="text-3xl font-bold text-gray-900">{totalVisitors.toLocaleString()}</p>
+                    <p className="text-sm font-medium text-gray-600">Unique Visitors</p>
+                    <p className="text-3xl font-bold text-gray-900">{uniqueVisitors}</p>
+                    <p className="text-xs text-gray-500 mt-1">Session-based tracking</p>
                   </div>
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <Users className="w-6 h-6 text-blue-600" />
-                  </div>
+                  <Users className="w-8 h-8 text-blue-600" />
                 </div>
               </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Services</p>
+                    <p className="text-sm font-medium text-gray-600">Average Daily</p>
+                    <p className="text-3xl font-bold text-gray-900">{avgVisitors}</p>
+                    <p className="text-xs text-gray-500 mt-1">Unique visits per day</p>
+                  </div>
+                  <TrendingUp className="w-8 h-8 text-green-600" />
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total Services</p>
                     <p className="text-3xl font-bold text-gray-900">{services.length}</p>
+                    <p className="text-xs text-gray-500 mt-1">Active service offerings</p>
                   </div>
-                  <div className="bg-green-100 p-3 rounded-full">
-                    <Settings className="w-6 h-6 text-green-600" />
-                  </div>
+                  <Settings className="w-8 h-8 text-purple-600" />
                 </div>
               </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Testimonials</p>
-                    <p className="text-3xl font-bold text-gray-900">{testimonials.length}</p>
-                  </div>
-                  <div className="bg-purple-100 p-3 rounded-full">
-                    <MessageSquare className="w-6 h-6 text-purple-600" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Avg Rating</p>
-                    <p className="text-3xl font-bold text-gray-900">{averageRating.toFixed(1)}</p>
+                    <p className="text-3xl font-bold text-gray-900">{averageTestimonialRating.toFixed(1)}</p>
+                    <p className="text-xs text-gray-500 mt-1">Customer satisfaction</p>
                   </div>
-                  <div className="bg-yellow-100 p-3 rounded-full">
-                    <Star className="w-6 h-6 text-yellow-600" />
-                  </div>
+                  <Star className="w-8 h-8 text-yellow-500" />
                 </div>
               </div>
             </div>
 
-            {/* Visitor Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Visitor Analytics</h3>
+            {/* Visitor Tracking Information */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Visitor Tracking Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-700">Tracking Method</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Session-based unique visitor tracking</li>
+                    <li>• 30-minute session timeout</li>
+                    <li>• 24-hour cooldown for repeat visits</li>
+                    <li>• Cross-tab session management</li>
+                  </ul>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-700">What Counts as a Visit</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• First landing on the website</li>
+                    <li>• Return after 24+ hours</li>
+                    <li>• New session after timeout</li>
+                    <li>• Does NOT count page refreshes or navigation</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Unique Visitor Analytics</h3>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={visitorData}>
+                  <BarChart data={visitorData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
+                    <XAxis 
+                      dataKey="date" 
+                      tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                    />
                     <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="visitors" stroke="#3B82F6" strokeWidth={2} />
-                  </LineChart>
+                    <Tooltip 
+                      labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                      formatter={(value) => [`${value} unique visitors`, 'Visitors']}
+                    />
+                    <Bar dataKey="visitors" fill="#3B82F6" />
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
@@ -273,408 +370,772 @@ export default function AdminDashboard({
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">Manage Services</h2>
               <button
-                onClick={() => setShowAddService(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                onClick={handleAddService}
+                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
                 <span>Add Service</span>
               </button>
             </div>
 
-            {/* Add Service Form */}
-            {showAddService && (
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Service</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                    <input
-                      type="text"
-                      value={newService.title}
-                      onChange={(e) => setNewService({ ...newService, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+            {categories.map(category => (
+              <div key={category} className="bg-white rounded-lg shadow-sm">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900">{category}</h3>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {services
+                      .filter(service => service.category === category)
+                      .map(service => (
+                        <div key={service.id} className="border border-gray-200 rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-semibold text-gray-900">{service.title}</h4>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => setEditingService(service)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteService(service.id)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-gray-600 text-sm">{service.description}</p>
+                        </div>
+                      ))}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                    <select
-                      value={newService.category}
-                      onChange={(e) => setNewService({ ...newService, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                </div>
+              </div>
+            ))}
+
+            {/* Edit Service Modal */}
+            {editingService && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">
+                      {isAddingService ? 'Add Service' : 'Edit Service'}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setEditingService(null);
+                        setIsAddingService(false);
+                      }}
+                      className="text-gray-400 hover:text-gray-600"
                     >
-                      <option value="Service Services">Service Services</option>
-                      <option value="Product Services">Product Services</option>
-                    </select>
+                      <X className="w-5 h-5" />
+                    </button>
                   </div>
-                </div>
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                  <textarea
-                    value={newService.description}
-                    onChange={(e) => setNewService({ ...newService, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div className="flex space-x-3 mt-4">
-                  <button
-                    onClick={handleAddService}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Save</span>
-                  </button>
-                  <button
-                    onClick={() => setShowAddService(false)}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
-                  >
-                    Cancel
-                  </button>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        value={editingService.title}
+                        onChange={(e) => setEditingService({
+                          ...editingService,
+                          title: e.target.value
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        value={editingService.description}
+                        onChange={(e) => setEditingService({
+                          ...editingService,
+                          description: e.target.value
+                        })}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Category
+                      </label>
+                      <select
+                        value={editingService.category}
+                        onChange={(e) => setEditingService({
+                          ...editingService,
+                          category: e.target.value
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="Product Services">Product Services</option>
+                        <option value="Service Services">Service Services</option>
+                        <option value="Custom Category">Add Custom Category</option>
+                      </select>
+                    </div>
+
+                    {editingService.category === 'Custom Category' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Custom Category Name
+                        </label>
+                        <input
+                          type="text"
+                          onChange={(e) => setEditingService({
+                            ...editingService,
+                            category: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter category name"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      onClick={() => {
+                        setEditingService(null);
+                        setIsAddingService(false);
+                      }}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveService}
+                      className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
-
-            {/* Services List */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Services</h3>
-                <div className="space-y-4">
-                  {services.map((service) => (
-                    <div key={service.id} className="border border-gray-200 rounded-lg p-4">
-                      {editingService?.id === service.id ? (
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                              <input
-                                type="text"
-                                value={editingService.title}
-                                onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                              <select
-                                value={editingService.category}
-                                onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              >
-                                <option value="Service Services">Service Services</option>
-                                <option value="Product Services">Product Services</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                            <textarea
-                              value={editingService.description}
-                              onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          </div>
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={handleUpdateService}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-                            >
-                              <Save className="w-4 h-4" />
-                              <span>Save</span>
-                            </button>
-                            <button
-                              onClick={() => setEditingService(null)}
-                              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="text-lg font-semibold text-gray-900">{service.title}</h4>
-                            <p className="text-sm text-blue-600 mb-2">{service.category}</p>
-                            <p className="text-gray-600">{service.description}</p>
-                          </div>
-                          <div className="flex space-x-2 ml-4">
-                            <button
-                              onClick={() => handleEditService(service)}
-                              className="text-blue-600 hover:text-blue-800 transition-colors"
-                            >
-                              <Edit className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteService(service.id)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
         {/* Testimonials Tab */}
         {activeTab === 'testimonials' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h2 className="text-2xl font-bold text-gray-900">Manage Testimonials</h2>
-              <button
-                onClick={() => setShowAddTestimonial(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Add Testimonial</span>
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                {selectedTestimonials.length > 0 && (
+                  <button
+                    onClick={handleBulkDelete}
+                    className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete Selected ({selectedTestimonials.length})</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleAddTestimonial}
+                  className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Review</span>
+                </button>
+              </div>
             </div>
 
-            {/* Add Testimonial Form */}
-            {showAddTestimonial && (
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Testimonial</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+            {/* Search and Filter */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      value={newTestimonial.name}
-                      onChange={(e) => setNewTestimonial({ ...newTestimonial, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Designation</label>
-                    <input
-                      type="text"
-                      value={newTestimonial.designation}
-                      onChange={(e) => setNewTestimonial({ ...newTestimonial, designation: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Search by name, designation, or review content..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
-                
-                <div className="mt-4">
-                  <ImageUpload
-                    currentImage={newTestimonial.avatar}
-                    onImageChange={(imageUrl) => setNewTestimonial({ ...newTestimonial, avatar: imageUrl })}
-                  />
-                </div>
-
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
-                  <div className="flex space-x-1">
-                    {renderStars(newTestimonial.rating, true, (rating) => 
-                      setNewTestimonial({ ...newTestimonial, rating })
-                    )}
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Comment</label>
-                  <textarea
-                    value={newTestimonial.comment}
-                    onChange={(e) => setNewTestimonial({ ...newTestimonial, comment: e.target.value })}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div className="flex space-x-3 mt-4">
-                  <button
-                    onClick={handleAddTestimonial}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                <div className="flex items-center space-x-3">
+                  <Filter className="w-5 h-5 text-gray-400" />
+                  <select
+                    value={ratingFilter || ''}
+                    onChange={(e) => setRatingFilter(e.target.value ? parseInt(e.target.value) : null)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <Save className="w-4 h-4" />
-                    <span>Save</span>
-                  </button>
-                  <button
-                    onClick={() => setShowAddTestimonial(false)}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
-                  >
-                    Cancel
-                  </button>
+                    <option value="">All Ratings</option>
+                    <option value="5">5 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="2">2 Stars</option>
+                    <option value="1">1 Star</option>
+                  </select>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Testimonials List */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Testimonials</h3>
-                <div className="space-y-4">
-                  {testimonials.map((testimonial) => (
-                    <div key={testimonial.id} className="border border-gray-200 rounded-lg p-4">
-                      {editingTestimonial?.id === testimonial.id ? (
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                              <input
-                                type="text"
-                                value={editingTestimonial.name}
-                                onChange={(e) => setEditingTestimonial({ ...editingTestimonial, name: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Designation</label>
-                              <input
-                                type="text"
-                                value={editingTestimonial.designation}
-                                onChange={(e) => setEditingTestimonial({ ...editingTestimonial, designation: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              />
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <ImageUpload
-                              currentImage={editingTestimonial.avatar}
-                              onImageChange={(imageUrl) => setEditingTestimonial({ ...editingTestimonial, avatar: imageUrl })}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
-                            <div className="flex space-x-1">
-                              {renderStars(editingTestimonial.rating, true, (rating) => 
-                                setEditingTestimonial({ ...editingTestimonial, rating })
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Comment</label>
-                            <textarea
-                              value={editingTestimonial.comment}
-                              onChange={(e) => setEditingTestimonial({ ...editingTestimonial, comment: e.target.value })}
-                              rows={4}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          </div>
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={handleUpdateTestimonial}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-                            >
-                              <Save className="w-4 h-4" />
-                              <span>Save</span>
-                            </button>
-                            <button
-                              onClick={() => setEditingTestimonial(null)}
-                              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-start space-x-4">
-                          <img
-                            src={testimonial.avatar}
-                            alt={testimonial.name}
-                            className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <h4 className="text-lg font-semibold text-gray-900">{testimonial.name}</h4>
-                              <span className="text-sm text-gray-600">- {testimonial.designation}</span>
-                            </div>
-                            <div className="flex items-center space-x-1 mb-2">
-                              {renderStars(testimonial.rating)}
-                            </div>
-                            <p className="text-gray-600 mb-2">"{testimonial.comment}"</p>
-                            <p className="text-sm text-gray-500">Added: {testimonial.dateAdded}</p>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleEditTestimonial(testimonial)}
-                              className="text-blue-600 hover:text-blue-800 transition-colors"
-                            >
-                              <Edit className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTestimonial(testimonial.id)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={selectAllTestimonials}
+                    className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    <CheckSquare className="w-4 h-4" />
+                    <span>
+                      {selectedTestimonials.length === filteredTestimonials.length ? 'Deselect All' : 'Select All'}
+                    </span>
+                  </button>
                 </div>
+                <p className="text-sm text-gray-600">
+                  {filteredTestimonials.length} of {testimonials.length} testimonials
+                </p>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Contact Info Tab */}
-        {activeTab === 'contact' && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Contact Information</h2>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Contact Details</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">Phone</p>
-                      <p className="text-gray-600">{contactInfo.phone}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Mail className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">Email</p>
-                      <p className="text-gray-600">{contactInfo.email}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 text-blue-600 mt-1" />
-                    <div>
-                      <p className="font-medium text-gray-900">Address</p>
-                      <p className="text-gray-600 whitespace-pre-line">{contactInfo.address}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <Clock className="w-5 h-5 text-blue-600 mt-1" />
-                    <div>
-                      <p className="font-medium text-gray-900">Business Hours</p>
-                      <div className="text-gray-600 space-y-1">
-                        <p><strong>Weekdays:</strong> {contactInfo.businessHours.weekdays}</p>
-                        <p><strong>Saturday:</strong> {contactInfo.businessHours.saturday}</p>
-                        <p><strong>Sunday:</strong> {contactInfo.businessHours.sunday}</p>
+              <div className="divide-y divide-gray-200">
+                {filteredTestimonials.map(testimonial => (
+                  <div key={testimonial.id} className="p-6 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start space-x-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedTestimonials.includes(testimonial.id)}
+                        onChange={() => toggleTestimonialSelection(testimonial.id)}
+                        className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      
+                      <img
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
+                            <p className="text-sm text-gray-600">{testimonial.designation}</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center">
+                              {Array.from({ length: 5 }, (_, index) => (
+                                <Star
+                                  key={index}
+                                  className={`w-4 h-4 ${
+                                    index < testimonial.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <div className="flex space-x-1">
+                              <button
+                                onClick={() => setEditingTestimonial(testimonial)}
+                                className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTestimonial(testimonial.id)}
+                                className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-sm leading-relaxed">"{testimonial.comment}"</p>
+                        <p className="text-xs text-gray-500 mt-2">Added: {new Date(testimonial.dateAdded).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Edit Testimonial Modal */}
+            {editingTestimonial && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-semibold">
+                      {isAddingTestimonial ? 'Add Testimonial' : 'Edit Testimonial'}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setEditingTestimonial(null);
+                        setIsAddingTestimonial(false);
+                      }}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Customer Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editingTestimonial.name}
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          name: e.target.value
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter customer name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Designation/Title
+                      </label>
+                      <input
+                        type="text"
+                        value={editingTestimonial.designation}
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          designation: e.target.value
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="e.g., Marketing Director, CEO"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Rating
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        {Array.from({ length: 5 }, (_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setEditingTestimonial({
+                              ...editingTestimonial,
+                              rating: index + 1
+                            })}
+                            className="focus:outline-none"
+                          >
+                            <Star
+                              className={`w-6 h-6 transition-colors ${
+                                index < editingTestimonial.rating 
+                                  ? 'text-yellow-400 fill-current hover:text-yellow-500' 
+                                  : 'text-gray-300 hover:text-gray-400'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                        <span className="ml-2 text-sm text-gray-600">
+                          {editingTestimonial.rating} star{editingTestimonial.rating !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Review Comment
+                      </label>
+                      <textarea
+                        value={editingTestimonial.comment}
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          comment: e.target.value
+                        })}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter the customer's review..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Profile Picture URL
+                      </label>
+                      <input
+                        type="url"
+                        value={editingTestimonial.avatar}
+                        onChange={(e) => setEditingTestimonial({
+                          ...editingTestimonial,
+                          avatar: e.target.value
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://example.com/photo.jpg"
+                      />
+                      {editingTestimonial.avatar && (
+                        <div className="mt-2">
+                          <img
+                            src={editingTestimonial.avatar}
+                            alt="Preview"
+                            className="w-16 h-16 rounded-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      onClick={() => {
+                        setEditingTestimonial(null);
+                        setIsAddingTestimonial(false);
+                      }}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveTestimonial}
+                      disabled={!editingTestimonial.name || !editingTestimonial.comment}
+                      className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-              
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-medium text-gray-900 mb-3">Social Media Links</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <p><strong>LinkedIn:</strong> <span className="text-blue-600">{contactInfo.socialMedia.linkedin}</span></p>
-                  <p><strong>Instagram:</strong> <span className="text-blue-600">{contactInfo.socialMedia.instagram}</span></p>
-                  <p><strong>Facebook:</strong> <span className="text-blue-600">{contactInfo.socialMedia.facebook}</span></p>
-                  <p><strong>WhatsApp:</strong> <span className="text-blue-600">{contactInfo.socialMedia.whatsapp}</span></p>
-                  <p><strong>TikTok:</strong> <span className="text-blue-600">{contactInfo.socialMedia.tiktok}</span></p>
+            )}
+          </div>
+        )}
+
+        {/* Contact Tab */}
+        {activeTab === 'contact' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Contact Information</h2>
+              <button
+                onClick={() => setEditingContact(!editingContact)}
+                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                <span>{editingContact ? 'Cancel' : 'Edit'}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Contact Information */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Contact Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Phone className="w-4 h-4 inline mr-2" />
+                    Phone Number
+                  </label>
+                  {editingContact ? (
+                    <input
+                      type="text"
+                      value={tempContactInfo.phone}
+                      onChange={(e) => setTempContactInfo({
+                        ...tempContactInfo,
+                        phone: e.target.value
+                      })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{contactInfo.phone}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Mail className="w-4 h-4 inline mr-2" />
+                    Email Address
+                  </label>
+                  {editingContact ? (
+                    <input
+                      type="email"
+                      value={tempContactInfo.email}
+                      onChange={(e) => setTempContactInfo({
+                        ...tempContactInfo,
+                        email: e.target.value
+                      })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{contactInfo.email}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <MapPin className="w-4 h-4 inline mr-2" />
+                    Address
+                  </label>
+                  {editingContact ? (
+                    <textarea
+                      value={tempContactInfo.address}
+                      onChange={(e) => setTempContactInfo({
+                        ...tempContactInfo,
+                        address: e.target.value
+                      })}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900 whitespace-pre-line">{contactInfo.address}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-4">
+                    <Clock className="w-4 h-4 inline mr-2" />
+                    Business Hours
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Monday - Friday
+                      </label>
+                      {editingContact ? (
+                        <input
+                          type="text"
+                          value={tempContactInfo.businessHours.weekdays}
+                          onChange={(e) => setTempContactInfo({
+                            ...tempContactInfo,
+                            businessHours: {
+                              ...tempContactInfo.businessHours,
+                              weekdays: e.target.value
+                            }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      ) : (
+                        <p className="text-gray-900">{contactInfo.businessHours.weekdays}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Saturday
+                      </label>
+                      {editingContact ? (
+                        <input
+                          type="text"
+                          value={tempContactInfo.businessHours.saturday}
+                          onChange={(e) => setTempContactInfo({
+                            ...tempContactInfo,
+                            businessHours: {
+                              ...tempContactInfo.businessHours,
+                              saturday: e.target.value
+                            }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      ) : (
+                        <p className="text-gray-900">{contactInfo.businessHours.saturday}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Sunday
+                      </label>
+                      {editingContact ? (
+                        <input
+                          type="text"
+                          value={tempContactInfo.businessHours.sunday}
+                          onChange={(e) => setTempContactInfo({
+                            ...tempContactInfo,
+                            businessHours: {
+                              ...tempContactInfo.businessHours,
+                              sunday: e.target.value
+                            }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      ) : (
+                        <p className="text-gray-900">{contactInfo.businessHours.sunday}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+
+              {/* Social Media Links */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Social Media Links</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Linkedin className="w-4 h-4 inline mr-2" />
+                      LinkedIn
+                    </label>
+                    {editingContact ? (
+                      <input
+                        type="url"
+                        value={tempContactInfo.socialMedia.linkedin}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
+                          socialMedia: {
+                            ...tempContactInfo.socialMedia,
+                            linkedin: e.target.value
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://linkedin.com/company/yourcompany"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{contactInfo.socialMedia.linkedin}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Instagram className="w-4 h-4 inline mr-2" />
+                      Instagram
+                    </label>
+                    {editingContact ? (
+                      <input
+                        type="url"
+                        value={tempContactInfo.socialMedia.instagram}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
+                          socialMedia: {
+                            ...tempContactInfo.socialMedia,
+                            instagram: e.target.value
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://instagram.com/yourcompany"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{contactInfo.socialMedia.instagram}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Facebook className="w-4 h-4 inline mr-2" />
+                      Facebook
+                    </label>
+                    {editingContact ? (
+                      <input
+                        type="url"
+                        value={tempContactInfo.socialMedia.facebook}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
+                          socialMedia: {
+                            ...tempContactInfo.socialMedia,
+                            facebook: e.target.value
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://facebook.com/yourcompany"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{contactInfo.socialMedia.facebook}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <WhatsAppIcon className="w-4 h-4 inline mr-2" />
+                      WhatsApp
+                    </label>
+                    {editingContact ? (
+                      <input
+                        type="url"
+                        value={tempContactInfo.socialMedia.whatsapp}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
+                          socialMedia: {
+                            ...tempContactInfo.socialMedia,
+                            whatsapp: e.target.value
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://wa.me/1234567890"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{contactInfo.socialMedia.whatsapp}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Music className="w-4 h-4 inline mr-2" />
+                      TikTok
+                    </label>
+                    {editingContact ? (
+                      <input
+                        type="url"
+                        value={tempContactInfo.socialMedia.tiktok}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
+                          socialMedia: {
+                            ...tempContactInfo.socialMedia,
+                            tiktok: e.target.value
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://tiktok.com/@yourcompany"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{contactInfo.socialMedia.tiktok}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Mail className="w-4 h-4 inline mr-2" />
+                      Email Link
+                    </label>
+                    {editingContact ? (
+                      <input
+                        type="text"
+                        value={tempContactInfo.socialMedia.email}
+                        onChange={(e) => setTempContactInfo({
+                          ...tempContactInfo,
+                          socialMedia: {
+                            ...tempContactInfo.socialMedia,
+                            email: e.target.value
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="mailto:contact@yourcompany.com"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{contactInfo.socialMedia.email}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
+            {editingContact && (
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setEditingContact(false);
+                    setTempContactInfo(contactInfo);
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveContact}
+                  className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
