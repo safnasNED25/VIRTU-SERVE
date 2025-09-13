@@ -28,8 +28,8 @@ import {
   MessageSquare,
   CheckSquare,
   MoreVertical,
-  Linkedin, // Add this import
-  Instagram, // Add this import
+  Linkedin, 
+  Instagram, 
   Facebook,
   Edit
 } from 'lucide-react';
