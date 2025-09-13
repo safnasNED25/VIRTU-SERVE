@@ -36,6 +36,7 @@ import {
 import { Service, ContactInfo, VisitorData, Testimonial } from '../types';
 import TikTokIcon from './ui/TikTokIcon';
 import WhatsAppIcon from './ui/WhatsAppIcon';
+import ImageUpload from './ui/ImageUpload';
 
 interface AdminDashboardProps {
   services: Service[];

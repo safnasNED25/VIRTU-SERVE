@@ -37,4 +37,5 @@ export interface Testimonial {
   comment: string;
   avatar: string;
   dateAdded: string;
+  imageType?: 'custom' | 'default-men' | 'default-women';
 }
